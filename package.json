@@ -1,0 +1,27 @@
+{
+  "name": "pizzatask",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "DEBUG=* ts-node src/index.ts --require ts-node/register",
+    "build": "./node_modules/typescript/bin/tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^2.6.9",
+    "event-stream": "latest"
+  },
+  "devDependencies": {
+    "@types/debug": "0.0.30",
+    "@types/event-stream": "^3.3.33",
+    "@types/node": "^9.4.6",
+    "chai": "^3.5.0",
+    "mocha": "^3.5.3",
+    "ts-node": "^5.0.0",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
+  }
+}
