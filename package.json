@@ -11,8 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/progress": "^2.0.1",
     "debug": "^2.6.9",
-    "event-stream": "latest"
+    "event-stream": "latest",
+    "progress": "^2.0.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.30",

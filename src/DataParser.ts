@@ -16,7 +16,7 @@ export class RidesData{
         this.rides = lines.slice(1, lines.length - 1).map((line, index) => [...line.split(' ')
             .map((num) => parseInt(num, 10)), index]);
         this.rides.sort((a: number[], b: number[]) => {
-            return a[5] - b[5] || a[4] - b[4];
+            return a[5] - b[5] || a[4] - b[4] || a[0] - b[0] || a[1] || b[1];
         })
     }
 }
