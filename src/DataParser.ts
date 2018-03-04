@@ -1,4 +1,5 @@
 import {readFileSync, writeFileSync} from "fs";
+import {Ride} from "./Car";
 
 export class RidesData{
     public R: number; // number of rows
@@ -7,16 +8,16 @@ export class RidesData{
     public N: number; // number of rides
     public B: number; // per-ride bonus
     public T: number; // number of steps in the simulation
-    public rides: number[][];
+    public rides: Ride[];
 
     constructor(data: string){
         const lines: string[] = data.split('\n');
         [this.R, this.C, this.F, this.N, this.B, this.T] = lines[0].split(' ')
             .map((num) => parseInt(num, 10));
-        this.rides = lines.slice(1, lines.length - 1).map((line, index) => [...line.split(' ')
-            .map((num) => parseInt(num, 10)), index]);
-        this.rides.sort((a: number[], b: number[]) => {
-            return a[5] - b[5] || a[4] - b[4] || a[0] - b[0] || a[1] || b[1];
+        this.rides = lines.slice(1, lines.length - 1).map((line, index) => new Ride([...line.split(' ')
+            .map((num) => parseInt(num, 10)), index]));
+        this.rides.sort((a:Ride, b: Ride) => {
+            return a.endTime - b.endTime || a.startTime - b.startTime;
         })
     }
 }

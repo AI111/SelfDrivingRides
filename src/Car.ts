@@ -1,3 +1,4 @@
+
 export class Point{
 
     constructor(public y: number, public x: number){
@@ -16,12 +17,20 @@ export class Ride{
     public startTime: number;
     public endTime: number;
     public id: number;
+    public  open: boolean = true;
+    public  finished: boolean = false;
+    private _rideLength: number;
+    public get rideLength(){
+        return this._rideLength;
+    }
+
     constructor(ride: number[]){
         this.start = new Point(ride[0], ride[1]);
         this.finish = new Point(ride[2], ride[3]);
         this.startTime = ride[4];
         this.endTime = ride[5];
-        this.id = ride[6]
+        this.id = ride[6];
+        this._rideLength = Math.abs(ride[0] - ride[2]) + Math.abs(ride[1] - ride[3])
     }
 }
 export class Car{
@@ -33,18 +42,16 @@ export class Car{
     constructor(public id: number){
 
     }
-    // public getDistance(y: Point): number;
-    public getDistance(y: number , x: number) : number{
-        // if(y instanceof Point) return Math.abs(y.x -this.position.x) + Math.abs(y.y - this.position.y);
-        // else
-            return Math.abs(x -this.position.x) + Math.abs(y - this.position.y);
+    public getDistance(point: Point): number {
+        return Math.abs(point.x -this.position.x) + Math.abs(point.y - this.position.y);
     }
     public toString(): string{
         return `${this.id} State: ${this.state}, position: ${this.position}, rides: ${this.finishedRides}`
     }
-    public setRide(data: number[]): void{
+    public setRide(data: Ride): void{
         if(this.state !== "idle") throw new Error("this car on ride");
-        this.ride = new Ride(data);
+        this.ride = data;
+        this.ride.open = false;
         if(this.position.equal(this.ride.start)){
             this.state = "ride";
         } else {
@@ -55,6 +62,7 @@ export class Car{
         if (this.state === "ride"){
             if(!this.driveToPoint(this.ride.finish)){
                 this.finishedRides.push(this.ride.id);
+                this.ride.finished = true;
                 this.state = "idle";
             }
         } else if(this.state  === "goToClient"){
