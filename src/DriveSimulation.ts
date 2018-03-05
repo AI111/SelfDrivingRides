@@ -1,20 +1,13 @@
-import {Car, Ride} from "./Car";
-import * as ProgressBar from "progress"
+import {Car, Point, Ride} from "./Car";
 import {readData, RidesData} from "./DataParser";
 export class DriveSimulation{
     private inputData: RidesData;
-    private bar: ProgressBar;
 
     private rideSelectFunction: (car: Car, step: number) => Ride;
+    private center: Point  = new Point(0,0);
 
     constructor(private inputFileName: string){
         this.inputData = readData(inputFileName);
-        // this.bar = new ProgressBar('  download |:bar| :percent', {
-        //     complete: '='
-        //     , incomplete: ' '
-        //     , width: 40
-        //     , total: this.inputData.T
-        // });
         console.log("START ",inputFileName );
         this.initSimulation();
     }
@@ -23,6 +16,22 @@ export class DriveSimulation{
         return this.fleet.map((car) => `${car.finishedRides.length} ${car.finishedRides.join(' ')}`).join('\n');
     }
     private initSimulation() {
+        // this.inputData.rides.forEach((ride) =>{
+        //     this.center.x += ride.start.x;
+        //     this.center.y += ride.start.y;
+        // });
+        // this.center.x/=this.inputData.rides.length;
+        // this.center.y/=this.inputData.rides.length;
+        //
+        // // this.inputData.rides.sort((a: Ride, b: Ride) => a.start.distanceTo(this.center) - b.start.distanceTo(this.center));
+        // this.inputData.rides = this.inputData.rides.filter((ride: Ride) => (
+        //     (Math.abs(ride.start.x - this.center.x) * Math.abs(ride.start.x - this.center.x)
+        //         + Math.abs(ride.start.y - this.center.y) * Math.abs(ride.start.y - this.center.y)
+        //         < this.inputData.R/7 * this.inputData.R/7)
+        //     && (Math.abs(ride.finish.x - this.center.x) * Math.abs(ride.finish.x - this.center.x)
+        //     + Math.abs(ride.finish.y - this.center.y) * Math.abs(ride.finish.y - this.center.y)
+        //     < this.inputData.R/7 * this.inputData.R/7))
+        // );
         const start = new  Date();
         this.fleet = new Array(this.inputData.F);
         if(this.inputData.B > 5){
@@ -30,15 +39,13 @@ export class DriveSimulation{
         else {
             this.rideSelectFunction = this.getRide;
         }
-        // this.fleet.fill(new Car());
         for( let i =0; i < this.fleet.length; i++) {
             this.fleet[i] = new Car(i);
         }
         for (let step = 0; step < this.inputData.T; step ++) {
             if(step % 1000 === 0) {
-                // console.log("STREP ",this.inputFileName, step);
-                // this.bar.tick(step);
-                this.inputData.rides = this.inputData.rides.filter((ride) => !ride.finished);
+                this.inputData.rides = this.inputData.rides.filter((ride) => ride.open);
+                // console.log("STREP ",this.inputFileName, step,this.inputData.rides.length);
             }
             this.tick(step);
         }
@@ -46,11 +53,6 @@ export class DriveSimulation{
     }
     private tick(step: number): void {
         for (const car of this.fleet){
-            // if(car.id === 1 || car.id === 0){
-            //     console.log(`STEP ${step} CAR: ${car.toString()}`);
-            // }
-            // console.log(step, this.inputData.rides);
-
             if(car.state === "idle"){
                 // magic
                 const  ride = this.rideSelectFunction(car, step);
@@ -59,7 +61,6 @@ export class DriveSimulation{
             }
             car.tick(step);
         }
-        // console.log(` STEP: ${step} ${this.fleet.map((car) => car.toString())}`);
     }
     private setRideV1(car: Car, tick: number): Ride {
         return this.inputData.rides.shift();
@@ -71,9 +72,10 @@ export class DriveSimulation{
             const distanceToFinish = distanceToStart + ride.rideLength;
             return ride.startTime <= distanceToStart + step && distanceToFinish + step < ride.endTime;
         });
-        validRides.sort((a: Ride, b: Ride) => car.getDistance(a.start) - car.getDistance(b.start) || b.rideLength - b.rideLength);
+        validRides.sort((a: Ride, b: Ride) => a.endTime - b.endTime || b.rideLength - a.rideLength || car.getDistance(a.start) - car.getDistance(b.start) );
         return validRides[0];
     }
+
     private getRideWithBonus(car: Car, step: number): Ride{
         const validRides = this.inputData.rides.filter((ride: Ride) =>{
             if(!ride.open || ride.finished || step > ride.endTime) return false;
@@ -81,8 +83,8 @@ export class DriveSimulation{
             const distanceToFinish = distanceToStart + ride.rideLength;
             return ride.startTime === distanceToStart + step && distanceToFinish + step < ride.endTime;
         });
-        if(!validRides.length) return this.getRide(car, step);
-        validRides.sort((a: Ride, b: Ride) => car.getDistance(a.start) - car.getDistance(b.start) || b.rideLength - b.rideLength);
+        if(!validRides.length) return this.getRide(car,step);
+        validRides.sort((a: Ride, b: Ride) => car.getDistance(a.start) - car.getDistance(b.start) || b.rideLength - a.rideLength);
         return validRides[0];
     }
 

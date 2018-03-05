@@ -7,6 +7,9 @@ export class Point{
     public equal(point: Point): boolean{
         return this.x === point.x && this.y === point.y;
     }
+    public distanceTo(point: Point): number{
+        return Math.abs(point.x -this.x) + Math.abs(point.y - this.y);
+    }
     public toString(){
         return `[${this.y} ${this.x}]`
     }
@@ -72,7 +75,7 @@ export class Car{
                 this.state = "ride";
             }
         } else {
-            console.log("НАЗНАЧЬ СУКА ПОЕЗДКУ")
+           throw new Error("Invalid state")
         }
     }
     private driveToPoint(point: Point): boolean{

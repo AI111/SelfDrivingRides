@@ -1,6 +1,12 @@
 import * as  cluster from "cluster"
 import {worker} from "cluster";
-const files = ['a_example.in', 'b_should_be_easy.in', 'c_no_hurry.in', 'd_metropolis.in', 'e_high_bonus.in'];
+const files = [
+    'a_example.in',
+    'b_should_be_easy.in',
+    'c_no_hurry.in',
+    'd_metropolis.in',
+    // 'e_high_bonus.in'
+];
 
 if(cluster.isMaster){
     for(let i = 0; i < files.length; i++){
